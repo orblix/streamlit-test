@@ -36,7 +36,7 @@ mkl-service==2.4.0
 mpmath==1.2.1
 murmurhash==1.0.9
 nmslib==2.1.1
-numpy==1.23.5
+numpy>=1.15.0
 onnxruntime==1.13.1
 openai==0.25.0
 openpyxl==3.0.10
