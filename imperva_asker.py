@@ -87,6 +87,7 @@ else:
     user_input = get_text()
 
 if user_input:
+    output = "PLACEHOLDER"
     # Check using regex if user input equals to key:API_KEY:
     if user_input == r"key:.*":
         set_key(user_input)
