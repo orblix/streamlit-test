@@ -100,7 +100,9 @@ if user_input:
     st.session_state.generated.append(output)
 
 if st.session_state["generated"]:
-
-    for i in range(len(st.session_state["generated"]) - 1, -1, -1):
-        message(st.session_state["generated"][i], key=str(i))
-        message(st.session_state["past"][i], is_user=True, key=str(i) + "_user")
+    if IS_FIRST:
+        st.session_state["generated"][0] = FIRST_MESSAGE
+    else:
+        for i in range(len(st.session_state["generated"]) - 1, -1, -1):
+            message(st.session_state["generated"][i], key=str(i))
+            message(st.session_state["past"][i], is_user=True, key=str(i) + "_user")
