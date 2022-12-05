@@ -78,6 +78,8 @@ def answer_question(question: str):
 
 def set_key(key):
     openai.api_key = key
+    IS_FIRST = False
+    print("Key set.")
 
 if IS_FIRST:
     user_input = get_first_text()
@@ -93,8 +95,8 @@ if user_input:
         if not IS_FIRST:
             output = answer_question(user_input)
 
-        st.session_state.past.append(user_input)
-        st.session_state.generated.append(output)
+    st.session_state.past.append(user_input)
+    st.session_state.generated.append(output)
 
 if st.session_state["generated"]:
 
