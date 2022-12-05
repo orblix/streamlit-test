@@ -6,7 +6,7 @@ import streamlit as st
 
 FIRST_MESSAGE = "Enter your openai public key here. Use 'key:YOUR_KEY'"
 SECOND_MESSAGE = "Enter your question here."
-IS_FIRST = True
+st.session_state.IS_KEY_SET = False
 
 st.set_page_config(page_title="Company Asker - Imperva Demo", page_icon=":robot:")
 
@@ -78,10 +78,10 @@ def answer_question(question: str):
 
 def set_key(key):
     openai.api_key = key
-    IS_FIRST = False
+    st.session_state.IS_KEY_SET = True
     print("Key set.")
 
-if IS_FIRST:
+if not st.session_state.IS_KEY_SET:
     user_input = get_first_text()
 else:
     user_input = get_text()
@@ -92,16 +92,15 @@ if user_input:
     if user_input == r"key:.*":
         set_key(user_input)
         output = "Key set."
-    elif user_input == SECOND_MESSAGE:
-        if not IS_FIRST:
-            output = answer_question(user_input)
+    elif st.session_state.IS_KEY_SET:
+        output = answer_question(user_input)
 
     st.session_state.past.append(user_input)
     st.session_state.generated.append(output)
 
 if st.session_state["generated"]:
-    if IS_FIRST:
-        st.session_state["generated"][0] = FIRST_MESSAGE
+    if not st.session_state.IS_KEY_SET:
+        message(st.session_state["generated"][0], key="0")
     else:
         for i in range(len(st.session_state["generated"]) - 1, -1, -1):
             message(st.session_state["generated"][i], key=str(i))
