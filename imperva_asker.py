@@ -1,5 +1,6 @@
 from pyserini.search.faiss import FaissSearcher
 from streamlit_chat import message
+from transformers import GPT2TokenizerFast
 import json
 import openai
 import streamlit as st
@@ -39,6 +40,11 @@ def get_raw_text(id):
                 return data["contents"]
         return "CONTEXT_NOT_FOUND"
 
+tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
+def estimate_prompt_tokens(prompt: str):
+    """Get chunk size making sure we can also fit the prompt in."""
+    prompt_tokens = tokenizer(prompt)
+    return len(prompt_tokens["input_ids"])
 
 def get_contexts(question: str):
     hits = searcher.search(question)
@@ -60,9 +66,14 @@ def get_answer(question: str, contexts: list, optional_args = {}):
         statistics, generated code
     """
     context = "\n\n".join(contexts)
-    prompt = f"{context}\n\nConsider the above contexts, answer the following question:\n{question}\nANSWER:"
+    prompt = f"Contexts about the Imperva company:\n\n{context}\n\nConsider the above contexts, answer the following question:\n{question}\nANSWER:"
+    prompt_tokens = estimate_prompt_tokens(prompt)
+    print("Prompt:")
+    print(prompt)
+    print(f"Prompt tokens: {prompt_tokens}")
+    print(f"Sending request with max_tokens={4096 - prompt_tokens - 1}")
     try:
-        kwargs = optional_args
+        kwargs = {**{"max_tokens": 4096 - prompt_tokens - 1}, **optional_args}
         response = openai.Completion.create(
             model="text-davinci-003", **kwargs, prompt=prompt
         )
@@ -72,7 +83,7 @@ def get_answer(question: str, contexts: list, optional_args = {}):
 
 def answer_question(question: str):
     contexts = get_contexts(question)
-    answer = get_answer(question, contexts, {"max_tokens": 1000, "temperature": 0})
+    answer = get_answer(question, contexts, {"temperature": 0})
     return answer
 
 def set_key(key):
@@ -98,7 +109,6 @@ if user_input:
         st.session_state.generated.append(output)
 
 if st.session_state["generated"]:
-    print(st.session_state)
     if not st.session_state["is_key_set"]:
         message(st.session_state["generated"][0], key="0")
     else:
