@@ -4,7 +4,7 @@ import json
 import openai
 import streamlit as st
 
-FIRST_MESSAGE = "Enter your openai public key here."
+FIRST_MESSAGE = "Enter your openai public key here. Use 'key:YOUR_KEY'"
 SECOND_MESSAGE = "Enter your question here."
 IS_FIRST = True
 
@@ -13,7 +13,7 @@ st.set_page_config(page_title="Company Asker - Imperva Demo", page_icon=":robot:
 st.header("Company Asker - Imperva Demo")
 
 if "generated" not in st.session_state:
-    st.session_state["generated"] = []
+    st.session_state["generated"] = [FIRST_MESSAGE]
 
 if "past" not in st.session_state:
     st.session_state["past"] = []
@@ -23,7 +23,7 @@ searcher = FaissSearcher("./index/", "castorini/tct_colbert-v2-hnp-msmarco")
 
 
 def get_first_text():
-    input_text = st.text_input("You: ", FIRST_MESSAGE, key="input")
+    input_text = st.text_input("You: ", "", key="input")
     return input_text
 
 def get_text():
